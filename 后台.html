@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maybank Admin - Customer Data Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #000 0%, #333 100%);
+            color: #ffcc00;
+            padding: 30px 40px;
+            text-align: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+        }
+        
+        .logo-text {
+            font-size: 2.2rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .admin-panel {
+            padding: 40px;
+        }
+        
+        .upload-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px dashed #ffcc00;
+        }
+        
+        .upload-area {
+            text-align: center;
+            padding: 40px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            margin-bottom: 20px;
+        }
+        
+        .file-input {
+            margin: 20px 0;
+        }
+        
+        input[type="file"] {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #000 0%, #333 100%);
+            color: #ffcc00;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: black;
+        }
+        
+        .data-section {
+            margin-top: 30px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #ffcc00;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .data-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #000;
+            color: #ffcc00;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-declined { background: #f8d7da; color: #721c24; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-withdrawn { background: #e2e3e5; color: #383d41; }
+        
+        .customer-card {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 5px;
+            background: #f8f9fa;
+        }
+        
+        .customer-card:last-child {
+            margin-bottom: 0;
+        }
+        
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-name {
+            flex: 1;
+        }
+        
+        .card-status {
+            margin-left: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #000;
+            color: #ffcc00;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ffcc00;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #28a745;
+        }
+        
+        .notification.error {
+            background: #dc3545;
+        }
+        
+        .notification.warning {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .manual-input {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 2px solid #ddd;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .input-group input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            flex: 1;
+        }
+        
+        .input-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .debug-info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="logo-text">MAYBANK ADMIN</div>
+            </div>
+            <h1>Customer Data Management System</h1>
+            <p>Upload and manage credit card application data</p>
+        </header>
+        
+        <div class="admin-panel">
+            <div class="upload-section">
+                <h2><i class="fas fa-upload"></i> Upload Customer Data</h2>
+                <div class="upload-area">
+                    <i class="fas fa-file-csv" style="font-size: 3rem; color: #ffcc00; margin-bottom: 20px;"></i>
+                    <h3>Upload Excel/CSV Files</h3>
+                    <p>Files should contain: Name (C), Card Type (P), Status (T) columns</p>
+                    
+                    <div class="debug-info">
+                        <strong>Expected Column Structure:</strong><br>
+                        • Column C: Customer Names (e.g., CHAU CHEE MENG)<br>
+                        • Column P: Card Types (e.g., Visa Signature, Amex SIA Krisflyer Platinum)<br>
+                        • Column T: Status Codes (A, D, P, W)<br>
+                        <small>系统会读取C列的所有客户姓名，P列的卡类型，T列的状态</small>
+                    </div>
+                    
+                    <input type="file" id="fileInput" class="file-input" accept=".csv,.xlsx,.xls" multiple>
+                    
+                    <div class="loading" id="loadingIndicator">
+                        <div class="spinner"></div>
+                        <p>Processing files, please wait...</p>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <button onclick="processFiles()">Process Files</button>
+                        <button onclick="saveToDatabase()" class="btn-success">Save to Database</button>
+                        <button onclick="loadSampleData()" class="btn-warning">Load Sample Data</button>
+                        <button onclick="clearAllData()" style="background: #dc3545; color: white;">Clear All Data</button>
+                    </div>
+                </div>
+
+                <!-- 手动输入区域 -->
+                <div class="manual-input">
+                    <h3><i class="fas fa-plus"></i> Add Customer Manually</h3>
+                    <div class="input-group">
+                        <input type="text" id="manualName" placeholder="Customer Name">
+                        <input type="text" id="manualCard" placeholder="Card Type">
+                        <select id="manualStatus">
+                            <option value="APPROVED">APPROVED</option>
+                            <option value="PENDING">PENDING</option>
+                            <option value="DECLINED">DECLINED</option>
+                            <option value="WITHDRAWN">WITHDRAWN</option>
+                        </select>
+                        <button onclick="addManualCustomer()" class="btn-success">Add Customer</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="data-section">
+                <div class="stats" id="statsContainer">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalCustomers">0</div>
+                        <div class="stat-label">Total Customers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalApplications">0</div>
+                        <div class="stat-label">Total Applications</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="approvedCount">0</div>
+                        <div class="stat-label">Approved</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="pendingCount">0</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                </div>
+                
+                <div class="data-table">
+                    <h3 style="padding: 20px; background: #f8f9fa; margin: 0; position: sticky; top: 0;">
+                        Customer Data Preview 
+                        <span style="float: right; font-size: 0.8rem; color: #666;" id="recordCount">0 records</span>
+                    </h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Card Applications</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody">
+                            <tr>
+                                <td colspan="3" style="text-align: center; padding: 40px; color: #666;">
+                                    No data loaded. Please upload files or load sample data.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Maybank Admin System &copy; 2024 | Secure Customer Data Management</p>
+        </footer>
+    </div>
+
+    <!-- 通知容器 -->
+    <div id="notification" class="notification"></div>
+
+    <!-- 引入SheetJS库用于处理Excel文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        // 简单直接的数据结构
+        let customerData = [];
+        
+        // 显示通知
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // 处理文件 - 修复版本
+        function processFiles() {
+            const fileInput = document.getElementById('fileInput');
+            const files = fileInput.files;
+            
+            if (files.length === 0) {
+                showNotification('Please select files first', 'warning');
+                return;
+            }
+
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            loadingIndicator.style.display = 'block';
+            
+            let processedCount = 0;
+            const totalFiles = files.length;
+            let totalRecords = 0;
+            
+            Array.from(files).forEach((file) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        console.log('Processing file:', file.name);
+                        
+                        let data;
+                        if (file.name.toLowerCase().endsWith('.csv')) {
+                            data = parseCSV(e.target.result);
+                        } else {
+                            // 处理Excel文件
+                            try {
+                                const workbook = XLSX.read(e.target.result, {type: 'array'});
+                                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                                data = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
+                            } catch (excelError) {
+                                showNotification('Error reading Excel file: ' + excelError.message, 'error');
+                                processedCount++;
+                                return;
+                            }
+                        }
+                        
+                        console.log('Raw data from file (first 3 rows):', data.slice(0, 3));
+                        const recordsProcessed = processFileData(data, file.name);
+                        totalRecords += recordsProcessed;
+                        processedCount++;
+                        
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showNotification(`Error processing ${file.name}: ${error.message}`, 'error');
+                        processedCount++;
+                    }
+                    
+                    // 所有文件处理完成
+                    if (processedCount === totalFiles) {
+                        loadingIndicator.style.display = 'none';
+                        updateStats();
+                        displayDataTable();
+                        
+                        if (totalRecords > 0) {
+                            showNotification(`Successfully processed ${totalFiles} file(s)! Added ${totalRecords} records from ${customerData.length} customers.`, 'success');
+                        } else {
+                            showNotification('No valid data found in the uploaded files. Please check the file format.', 'warning');
+                        }
+                    }
+                };
+                
+                reader.onerror = function() {
+                    console.error('Error reading file');
+                    showNotification(`Error reading ${file.name}`, 'error');
+                    processedCount++;
+                    if (processedCount === totalFiles) {
+                        loadingIndicator.style.display = 'none';
+                    }
+                };
+                
+                if (file.name.toLowerCase().endsWith('.csv')) {
+                    reader.readAsText(file);
+                } else {
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+        }
+
+        // 改进的CSV解析
+        function parseCSV(csvText) {
+            const rows = [];
+            const lines = csvText.split('\n');
+            
+            for (let line of lines) {
+                line = line.trim();
+                if (line === '') continue;
+                
+                // 改进的CSV解析，处理带引号的字段
+                const row = [];
+                let currentField = '';
+                let inQuotes = false;
+                
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        row.push(currentField.trim());
+                        currentField = '';
+                    } else {
+                        currentField += char;
+                    }
+                }
+                
+                // 添加最后一个字段
+                row.push(currentField.trim());
+                rows.push(row);
+            }
+            return rows;
+        }
+
+        // 处理文件数据 - 根据C列、P列、T列处理
+        function processFileData(data, fileName) {
+            if (!data || data.length === 0) {
+                console.log('No data found in file:', fileName);
+                return 0;
+            }
+            
+            // 根据您的描述，使用固定列位置：
+            const nameIndex = 2;    // C列 (索引2 = 第3列)
+            const cardIndex = 15;   // P列 (索引15 = 第16列)  
+            const statusIndex = 19; // T列 (索引19 = 第20列)
+            
+            console.log(`Using fixed columns - Name: ${nameIndex}, Card: ${cardIndex}, Status: ${statusIndex}`);
+            
+            let recordsProcessed = 0;
+            
+            // 从第一行开始处理（假设第一行可能是标题行，但我们会检查）
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
+                if (!row || row.length === 0) continue;
+                
+                // 检查是否是标题行（包含"Name", "Card", "Status"等关键词）
+                const firstCell = String(row[0] || '').toLowerCase();
+                if (firstCell.includes('name') || firstCell.includes('card') || firstCell.includes('status')) {
+                    console.log('Skipping header row:', row);
+                    continue; // 跳过标题行
+                }
+                
+                // 获取C列、P列、T列的数据
+                const name = row[nameIndex] ? String(row[nameIndex]).trim() : '';
+                const cardType = row[cardIndex] ? String(row[cardIndex]).trim() : '';
+                let status = row[statusIndex] ? String(row[statusIndex]).trim().toUpperCase() : '';
+                
+                // 跳过无效行（C列为空的行）
+                if (!name || name === '' || name === 'C' || name === 'Name') {
+                    continue;
+                }
+                
+                // 如果卡类型为空，跳过
+                if (!cardType || cardType === 'P' || cardType === 'Card Type') {
+                    continue;
+                }
+                
+                // 标准化状态
+                status = normalizeStatus(status);
+                
+                console.log(`Processing record ${i + 1}: ${name} - ${cardType} - ${status}`);
+                addOrUpdateCustomer(name, cardType, status);
+                recordsProcessed++;
+            }
+            
+            console.log(`Processed ${recordsProcessed} valid records from ${fileName}`);
+            return recordsProcessed;
+        }
+
+        // 标准化状态
+        function normalizeStatus(status) {
+            status = status.toUpperCase();
+            if (status === 'A' || status === 'APPROVED') return 'APPROVED';
+            if (status === 'D' || status === 'DECLINED' || status === 'REJECTED') return 'DECLINED';
+            if (status === 'P' || status === 'PENDING') return 'PENDING';
+            if (status === 'W' || status === 'WITHDRAWN') return 'WITHDRAWN';
+            return status || 'PENDING';
+        }
+
+        // 添加或更新客户
+        function addOrUpdateCustomer(name, cardType, status) {
+            const normalizedName = name.toLowerCase().replace(/\s+/g, '');
+            
+            // 查找现有客户
+            let customer = customerData.find(c => c.normalizedName === normalizedName);
+            
+            if (!customer) {
+                customer = {
+                    name: name,
+                    normalizedName: normalizedName,
+                    applications: []
+                };
+                customerData.push(customer);
+            }
+            
+            // 检查是否已存在相同的申请
+            const existingApp = customer.applications.find(app => 
+                app.card === cardType && app.status === status
+            );
+            
+            if (!existingApp) {
+                customer.applications.push({
+                    card: cardType,
+                    status: status
+                });
+            }
+        }
+
+        // 手动添加客户
+        function addManualCustomer() {
+            const name = document.getElementById('manualName').value.trim();
+            const card = document.getElementById('manualCard').value.trim();
+            const status = document.getElementById('manualStatus').value;
+            
+            if (!name || !card) {
+                showNotification('Please enter both name and card type', 'warning');
+                return;
+            }
+            
+            addOrUpdateCustomer(name, card, status);
+            
+            // 清空输入框
+            document.getElementById('manualName').value = '';
+            document.getElementById('manualCard').value = '';
+            
+            updateStats();
+            displayDataTable();
+            showNotification('Customer added successfully!', 'success');
+        }
+
+        // 更新统计
+        function updateStats() {
+            const totalCustomers = customerData.length;
+            let totalApplications = 0;
+            let approved = 0, pending = 0, declined = 0, withdrawn = 0;
+            
+            customerData.forEach(customer => {
+                totalApplications += customer.applications.length;
+                customer.applications.forEach(app => {
+                    if (app.status === 'APPROVED') approved++;
+                    else if (app.status === 'PENDING') pending++;
+                    else if (app.status === 'DECLINED') declined++;
+                    else if (app.status === 'WITHDRAWN') withdrawn++;
+                });
+            });
+            
+            document.getElementById('totalCustomers').textContent = totalCustomers;
+            document.getElementById('totalApplications').textContent = totalApplications;
+            document.getElementById('approvedCount').textContent = approved;
+            document.getElementById('pendingCount').textContent = pending;
+        }
+
+        // 显示数据表格
+        function displayDataTable() {
+            const tableBody = document.getElementById('dataTableBody');
+            const recordCount = document.getElementById('recordCount');
+            
+            if (customerData.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 40px; color: #666;">No data available</td></tr>';
+                recordCount.textContent = '0 records';
+                return;
+            }
+            
+            tableBody.innerHTML = '';
+            recordCount.textContent = `${customerData.length} customers`;
+            
+            customerData.forEach((customer) => {
+                const row = tableBody.insertRow();
+                
+                // Name
+                row.insertCell(0).textContent = customer.name;
+                
+                // Card Applications
+                const cardCell = row.insertCell(1);
+                cardCell.innerHTML = '';
+                
+                customer.applications.forEach((application) => {
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'customer-card';
+                    
+                    const cardDetails = document.createElement('div');
+                    cardDetails.className = 'card-details';
+                    
+                    const cardName = document.createElement('div');
+                    cardName.className = 'card-name';
+                    cardName.textContent = application.card;
+                    
+                    const cardStatus = document.createElement('div');
+                    cardStatus.className = 'card-status';
+                    
+                    const statusClass = `status-${application.status.toLowerCase()}`;
+                    cardStatus.innerHTML = `<span class="status-badge ${statusClass}">${application.status}</span>`;
+                    
+                    cardDetails.appendChild(cardName);
+                    cardDetails.appendChild(cardStatus);
+                    cardDiv.appendChild(cardDetails);
+                    cardCell.appendChild(cardDiv);
+                });
+                
+                // Actions
+                const actionCell = row.insertCell(2);
+                actionCell.innerHTML = `
+                    <button onclick="deleteCustomer('${customer.normalizedName}')" style="padding: 5px 10px; font-size: 0.8rem; background: #dc3545; color: white;">Delete</button>
+                `;
+            });
+        }
+
+        // 删除客户
+        function deleteCustomer(normalizedName) {
+            if (confirm('Are you sure you want to delete this customer?')) {
+                customerData = customerData.filter(c => c.normalizedName !== normalizedName);
+                updateStats();
+                displayDataTable();
+                showNotification('Customer deleted successfully', 'success');
+            }
+        }
+
+        // 保存到数据库
+        function saveToDatabase() {
+            if (customerData.length === 0) {
+                showNotification('No data to save', 'warning');
+                return;
+            }
+            
+            try {
+                localStorage.setItem('maybankCustomerDatabase', JSON.stringify(customerData));
+                showNotification(`✅ Data saved! ${customerData.length} customers with ${getTotalApplications()} applications available for query.`, 'success');
+            } catch (e) {
+                showNotification('Error saving data: ' + e.message, 'error');
+            }
+        }
+
+        // 获取总申请数
+        function getTotalApplications() {
+            return customerData.reduce((total, customer) => total + customer.applications.length, 0);
+        }
+
+        // 加载示例数据
+        function loadSampleData() {
+            customerData = [
+                {
+                    name: "CHAU CHEE MENG",
+                    normalizedName: "chaucheemeng",
+                    applications: [
+                        { card: "Visa Signature", status: "APPROVED" },
+                        { card: "Amex SIA Krisflyer Platinum", status: "DECLINED" }
+                    ]
+                }
+            ];
+            
+            updateStats();
+            displayDataTable();
+            showNotification('Sample data loaded successfully!', 'success');
+        }
+
+        // 清空所有数据
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                customerData = [];
+                localStorage.removeItem('maybankCustomerDatabase');
+                updateStats();
+                displayDataTable();
+                document.getElementById('fileInput').value = '';
+                showNotification('All data cleared', 'success');
+            }
+        }
+
+        // 初始化 - 修复数据加载
+        window.addEventListener('load', function() {
+            try {
+                const saved = localStorage.getItem('maybankCustomerDatabase');
+                if (saved) {
+                    customerData = JSON.parse(saved);
+                    updateStats();
+                    displayDataTable();
+                    console.log('Data loaded successfully:', customerData.length, 'customers');
+                }
+            } catch (e) {
+                console.log('No previous data or error loading data');
+                customerData = [];
+            }
+        });
+    </script>
+</body>
+</html>
